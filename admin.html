@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard | CUZ QR Attendance{% endblock %}
+
+{% block content %}
+<section class="panel">
+    <h1 class="page-title">Lecturer Dashboard</h1>
+    <p class="lead">Create a lecture session or review submitted attendance records.</p>
+
+    <div class="actions">
+        <a class="button" href="{{ url_for('create_session') }}">Create Session</a>
+        <a class="button button-secondary" href="{{ url_for('view_records') }}">View Records</a>
+    </div>
+</section>
+{% endblock %}

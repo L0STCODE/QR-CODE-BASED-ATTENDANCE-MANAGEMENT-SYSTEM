@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block title %}My Attendance | CUZ QR Attendance{% endblock %}
+
+{% block content %}
+<section class="stack">
+    <div class="student-hero hero-green">
+        <div>
+            <span class="eyebrow">Attendance Summary</span>
+            <h1 class="page-title">My Attendance</h1>
+            <p class="lead">Welcome, {{ student["name"] }}.</p>
+        </div>
+        <div class="student-initials">{{ initials }}</div>
+    </div>
+
+    <section class="wide-panel panel">
+        <div class="summary-grid four-stats">
+            <div class="stat">
+                <span class="muted">Total Present</span>
+                <span class="stat-value">{{ present_count }}</span>
+            </div>
+            <div class="stat">
+                <span class="muted">Total Late</span>
+                <span class="stat-value">{{ late_count }}</span>
+            </div>
+            <div class="stat">
+                <span class="muted">Total Absent</span>
+                <span class="stat-value">{{ absent_count }}</span>
+            </div>
+            <div class="stat">
+                <span class="muted">Attendance</span>
+                <span class="stat-value">{{ attendance_percentage }}%</span>
+            </div>
+        </div>
+
+        <div class="progress-track">
+            <div class="progress-bar" style="width: {{ (attendance_percentage|default(0)|max(0)|min(100)) ~ '%' }};"></div>
+        </div>
+    </section>
+
+    <section class="wide-panel panel">
+        <h2 class="section-title">Attendance History</h2>
+
+        {% if records %}
+            <div class="report-list">
+                {% for row in records %}
+                    <article class="attendance-card">
+                        <div>
+                            <strong>{{ row["course_code"] or "Not set" }}</strong>
+                            <p>{{ row["course_name"] or "Course name not set" }}</p>
+                            <span class="muted">{{ row["session_name"] }}</span>
+                        </div>
+                        <div>
+                            <span class="status-badge status-{{ (row['status'] or 'Present')|lower }}">{{ row["status"] or "Present" }}</span>
+                            <p class="muted">{{ row["timestamp"] }}</p>
+                        </div>
+                    </article>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-state">No attendance records yet. Scan the QR code displayed by your lecturer to record attendance.</div>
+        {% endif %}
+    </section>
+
+    <nav class="bottom-nav">
+        <a href="{{ url_for('student_dashboard') }}">Home</a>
+        <a href="{{ url_for('student_dashboard') }}#courses">Courses</a>
+        <a href="{{ url_for('student_attendance_report') }}">Attendance</a>
+        <a href="{{ url_for('logout') }}">Logout</a>
+    </nav>
+</section>
+{% endblock %}

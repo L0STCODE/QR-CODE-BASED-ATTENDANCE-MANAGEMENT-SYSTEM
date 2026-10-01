@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block title %}QR Code | CUZ QR Attendance{% endblock %}
+
+{% block content %}
+<section class="panel center-text">
+    <h1 class="page-title">Session QR Code</h1>
+    <p class="lead">QR codes are now generated directly from the lecturer session page.</p>
+
+    <a class="button" href="{{ url_for('create_session') }}">Create Session</a>
+</section>
+{% endblock %}

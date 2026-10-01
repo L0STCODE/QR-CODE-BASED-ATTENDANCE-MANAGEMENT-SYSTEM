@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}Attendance Status | CUZ QR Attendance{% endblock %}
+
+{% block content %}
+<section class="panel">
+    {% if result == "success" %}
+        <h1 class="page-title">Attendance recorded successfully</h1>
+        <p class="lead">Your attendance has been saved.</p>
+    {% elif result == "already" %}
+        <h1 class="page-title">Attendance has already been recorded for this session.</h1>
+        <p class="lead">You have already marked attendance.</p>
+    {% elif result == "expired" %}
+        <h1 class="page-title">This attendance session has expired.</h1>
+        <p class="lead">This session is no longer accepting attendance.</p>
+    {% elif result == "not_enrolled" %}
+        <h1 class="page-title">You are not enrolled in this course.</h1>
+        <p class="lead">Please contact your lecturer if this course should be assigned to you.</p>
+    {% else %}
+        <h1 class="page-title">This session is no longer accepting attendance.</h1>
+        <p class="lead">Please contact your lecturer if you think this is a mistake.</p>
+    {% endif %}
+
+    {% if result in ["success", "already"] %}
+        <div class="details-list">
+            <p><strong>Student name:</strong> {{ student_name }}</p>
+            <p><strong>Student number:</strong> {{ student_number }}</p>
+            <p><strong>Course:</strong> {{ course_code or "Not set" }}{% if course_name %} - {{ course_name }}{% endif %}</p>
+            <p><strong>Session:</strong> {{ session_name }}</p>
+            <p><strong>Time marked:</strong> {{ marked_time }}</p>
+        </div>
+    {% else %}
+        <div class="details-list">
+            <p><strong>Course:</strong> {{ course_code or "Not set" }}{% if course_name %} - {{ course_name }}{% endif %}</p>
+            <p><strong>Session:</strong> {{ session_name }}</p>
+            <p><strong>Status:</strong> {{ session_status }}</p>
+        </div>
+    {% endif %}
+
+    <div class="actions">
+        <a class="button" href="{{ url_for('student_dashboard') }}">Go to Student Dashboard</a>
+    </div>
+</section>
+{% endblock %}

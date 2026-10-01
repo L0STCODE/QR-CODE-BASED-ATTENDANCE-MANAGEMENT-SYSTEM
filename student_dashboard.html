@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+
+{% block title %}Student Dashboard | CUZ QR Attendance{% endblock %}
+
+{% block content %}
+<section class="stack student-dashboard">
+    <div class="student-hero hero-green">
+        <div>
+            <span class="eyebrow">QR scanning</span>
+            <h1 class="page-title">My Courses</h1>
+            <p class="lead">Welcome back, {{ student["name"] }}.</p>
+        </div>
+        <div class="student-badge-row">
+            <div class="student-initials">{{ initials }}</div>
+            <span class="course-count">{{ courses|length }} courses</span>
+        </div>
+    </div>
+
+    <section class="student-info-grid">
+        <div class="info-tile">
+            <span>Student Number</span>
+            <strong>{{ student_number }}</strong>
+        </div>
+        <div class="info-tile">
+            <span>Programme</span>
+            <strong>{{ student["programme"] or "BSc Computing" }}</strong>
+        </div>
+        <div class="info-tile">
+            <span>Year</span>
+            <strong>{{ student["year"] or 3 }}</strong>
+        </div>
+        <div class="info-tile">
+            <span>Semester</span>
+            <strong>{{ student["semester"] or 2 }}</strong>
+        </div>
+        <div class="info-tile">
+            <span>Mode</span>
+            <strong>{{ student["mode"] or "Full-time" }}</strong>
+        </div>
+    </section>
+
+    <section class="wide-panel panel" id="attendance">
+        <div class="section-heading-row">
+            <h2 class="section-title">Attendance Summary</h2>
+            <a class="button button-secondary" href="{{ url_for('student_attendance_report') }}">View Report</a>
+        </div>
+
+        <div class="summary-grid four-stats">
+            <div class="stat">
+                <span class="muted">Present</span>
+                <span class="stat-value">{{ present_count }}</span>
+            </div>
+            <div class="stat">
+                <span class="muted">Late</span>
+                <span class="stat-value">{{ late_count }}</span>
+            </div>
+            <div class="stat">
+                <span class="muted">Absent</span>
+                <span class="stat-value">{{ absent_count }}</span>
+            </div>
+            <div class="stat">
+                <span class="muted">Attendance</span>
+                <span class="stat-value">{{ attendance_percentage }}%</span>
+            </div>
+        </div>
+
+        <div class="progress-track" aria-label="Attendance percentage">
+            <div class="progress-bar" style="width: {{ attendance_percentage | default(0) }}%;"></div>
+        </div>
+    </section>
+
+    <section class="wide-panel panel" id="courses">
+        <h2 class="section-title">Enrolled Courses</h2>
+
+        {% if courses %}
+            <div class="course-grid dashboard-courses">
+                {% for course in courses %}
+                    <article class="course-card course-card-modern">
+                        <div>
+                            <strong>{{ course["course_code"] }}</strong>
+                            <p>{{ course["course_name"] }}</p>
+                            <span class="muted">
+                                {{ course["class_day"] or "Class day not set" }}
+                                {% if course["start_time"] and course["end_time"] %}
+                                    {{ course["start_time"] }} - {{ course["end_time"] }}
+                                {% endif %}
+                            </span>
+                        </div>
+                        <div class="course-action">
+                            {% if course["active_session_code"] %}
+                                <span class="status-badge status-open">Open</span>
+                                <a class="button button-small" href="{{ url_for('student_scan', session_code=course['active_session_code']) }}">Scan Attendance</a>
+                            {% else %}
+                                <span class="muted">No active session</span>
+                            {% endif %}
+                        </div>
+                    </article>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-state">No courses assigned yet. Please contact your lecturer.</div>
+        {% endif %}
+    </section>
+
+    <section class="wide-panel panel">
+        <h2 class="section-title">Recent Attendance</h2>
+
+        {% if recent_records %}
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Course Code</th>
+                            <th>Course Name</th>
+                            <th>Session Name</th>
+                            <th>Date/Time</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in recent_records %}
+                            <tr>
+                                <td>{{ row["course_code"] or "Not set" }}</td>
+                                <td>{{ row["course_name"] or "Not set" }}</td>
+                                <td>{{ row["session_name"] }}</td>
+                                <td>{{ row["timestamp"] }}</td>
+                                <td><span class="status-badge status-{{ (row['status'] or 'Present')|lower }}">{{ row["status"] or "Present" }}</span></td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="empty-state">No attendance records yet. Scan the QR code displayed by your lecturer to record attendance.</div>
+        {% endif %}
+    </section>
+
+    <nav class="bottom-nav" aria-label="Student dashboard links">
+        <a href="{{ url_for('student_dashboard') }}">Home</a>
+        <a href="#courses">Courses</a>
+        <a href="{{ url_for('student_attendance_report') }}">Attendance</a>
+        <a href="{{ url_for('logout') }}">Logout</a>
+    </nav>
+</section>
+{% endblock %}

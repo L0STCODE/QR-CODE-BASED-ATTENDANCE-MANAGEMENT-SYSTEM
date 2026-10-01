@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Courses | CUZ QR Attendance{% endblock %}
+
+{% block content %}
+<section class="stack">
+    <section class="wide-panel panel">
+        <h1 class="page-title">Manage Courses</h1>
+        <p class="lead">Add new courses, update course names, and keep timetable details clear for students.</p>
+
+        <form class="form-grid course-form" method="POST">
+            <input type="hidden" name="action" value="add">
+            <label>
+                Course Code
+                <input type="text" name="course_code" placeholder="IT326" autocomplete="off" required>
+            </label>
+            <label>
+                Course Name
+                <input type="text" name="course_name" placeholder="Computer Networks" autocomplete="off" required>
+            </label>
+            <label>
+                Class Day
+                <input type="text" name="class_day" placeholder="Monday" autocomplete="off">
+            </label>
+            <label>
+                Start Time
+                <input type="time" name="start_time">
+            </label>
+            <label>
+                End Time
+                <input type="time" name="end_time">
+            </label>
+            <button type="submit">Add Course</button>
+        </form>
+    </section>
+
+    <section class="wide-panel panel">
+        <h2 class="section-title">All Courses</h2>
+
+        {% if courses %}
+            <div class="course-manage-list">
+                {% for course in courses %}
+                    <article class="manage-course-card">
+                        <form class="form-grid course-edit-form" method="POST">
+                            <input type="hidden" name="action" value="edit">
+                            <input type="hidden" name="course_code" value="{{ course['course_code'] }}">
+                            <strong>{{ course["course_code"] }}</strong>
+                            <input type="text" name="course_name" value="{{ course['course_name'] }}" required>
+                            <input type="text" name="class_day" value="{{ course['class_day'] or '' }}" placeholder="Class day">
+                            <input type="time" name="start_time" value="{{ course['start_time'] or '' }}">
+                            <input type="time" name="end_time" value="{{ course['end_time'] or '' }}">
+                            <button class="button-small" type="submit">Save</button>
+                        </form>
+
+                        <div class="course-meta-line">
+                            <span>{{ course["student_count"] }} students</span>
+                            <span>{{ course["session_count"] }} sessions</span>
+                        </div>
+
+                        <form method="POST" data-confirm-delete="true">
+                            <input type="hidden" name="action" value="delete">
+                            <input type="hidden" name="course_code" value="{{ course['course_code'] }}">
+                            <button class="button-danger button-small" type="submit">Delete</button>
+                        </form>
+                    </article>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-state">No courses have been added yet.</div>
+        {% endif %}
+    </section>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+{% endblock %}

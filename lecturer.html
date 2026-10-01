@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+
+{% block title %}{{ session_name }} | CUZ QR Attendance{% endblock %}
+
+{% block content %}
+<section class="stack">
+    <div class="qr-display-header">
+        <div>
+            <span class="eyebrow">Attendance Session</span>
+            <h1 class="page-title">{{ session_name }}</h1>
+            <p class="lead">{{ course_code or "Course" }}{% if course_name %} - {{ course_name }}{% endif %}</p>
+        </div>
+        <span class="status-badge status-{{ status or 'open' }}">{{ status or "open" }}</span>
+    </div>
+
+    <div class="dashboard-grid">
+        <aside class="card qr-projector-card">
+            <h2 class="section-title">Students should scan this QR code to mark attendance.</h2>
+
+            <div class="stat">
+                <span class="muted">Attendance count</span>
+                <span class="stat-value" id="attendance-count">{{ records|length }}</span>
+            </div>
+
+            <img class="qr-image" alt="QR code for {{ session_name }}" src="{{ qr_image_url }}">
+
+            <div class="session-meta">
+                <p class="muted">Course: {{ course_code or "Not set" }}{% if course_name %} - {{ course_name }}{% endif %}</p>
+                <p class="muted">Session: {{ session_name }}</p>
+                <p class="muted">Session date: {{ created_at }}</p>
+                <p class="muted">End time: {{ expires_at }}</p>
+                <p class="muted">Duration: {{ duration_minutes or 120 }} minutes</p>
+            </div>
+
+            <div class="actions vertical-actions">
+                <a class="button button-secondary" href="{{ url_for('export_session_report', session_code=session_code) }}">Download CSV Report</a>
+                {% if status == "open" %}
+                    <form method="POST" action="{{ url_for('close_session', session_code=session_code) }}">
+                        <button class="button-danger" type="submit">Close Session</button>
+                    </form>
+                {% endif %}
+                <form method="POST" action="{{ url_for('delete_session', session_code=session_code) }}" data-confirm-delete="true">
+                    <button class="button-danger" type="submit">Delete Session</button>
+                </form>
+            </div>
+        </aside>
+
+        <section class="card">
+            <h2 class="section-title">Attendance Records</h2>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Student ID</th>
+                            <th>Status</th>
+                            <th>Time</th>
+                        </tr>
+                    </thead>
+                    <tbody id="attendance-body">
+                        {% for record in records %}
+                            <tr>
+                                <td>{{ record["name"] }}</td>
+                                <td>{{ record["student_id"] }}</td>
+                                <td><span class="status-badge status-{{ (record['status'] or 'Present')|lower }}">{{ record["status"] or "Present" }}</span></td>
+                                <td>{{ record["timestamp"] }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <div class="empty-state" id="empty-state" {% if records %}hidden{% endif %}>
+                    No students have marked attendance yet.
+                </div>
+            </div>
+        </section>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+<script>
+function escapeHtml(value) {
+    return String(value).replace(/[&<>"']/g, function (char) {
+        return {
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            "\"": "&quot;",
+            "'": "&#039;"
+        }[char];
+    });
+}
+
+function loadAttendance() {
+    fetch("{{ url_for('attendance_data', session_code=session_code) }}")
+        .then(response => response.json())
+        .then(data => {
+            const table = document.getElementById("attendance-body");
+            const count = document.getElementById("attendance-count");
+            const emptyState = document.getElementById("empty-state");
+
+            table.innerHTML = "";
+            count.textContent = data.records.length;
+            emptyState.hidden = data.records.length > 0;
+
+            data.records.forEach(record => {
+                table.insertAdjacentHTML("beforeend", `
+                    <tr>
+                        <td>${escapeHtml(record[0])}</td>
+                        <td>${escapeHtml(record[1])}</td>
+                        <td><span class="status-badge status-present">${escapeHtml(record[2] || "Present")}</span></td>
+                        <td>${escapeHtml(record[3])}</td>
+                    </tr>
+                `);
+            });
+        });
+}
+
+loadAttendance();
+setInterval(loadAttendance, 3000);
+</script>
+{% endblock %}

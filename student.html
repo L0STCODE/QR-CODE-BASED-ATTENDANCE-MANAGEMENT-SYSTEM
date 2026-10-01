@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}Student Login | CUZ QR Attendance{% endblock %}
+
+{% block content %}
+<section class="auth-shell">
+    <div class="auth-banner auth-banner-green">
+        <span class="eyebrow">Cavendish Attendance</span>
+        <div class="auth-logo-box">S</div>
+        <h1>Student Login</h1>
+        <p>Secure Student Attendance Portal</p>
+    </div>
+
+    <form class="form-grid auth-card" method="POST">
+        <input type="hidden" name="next" value="{{ next_url }}">
+
+        <label>
+            Student Number
+            <input type="text" name="student_number" placeholder=" Enter student ID" autocomplete="username" required>
+        </label>
+
+        <label>
+            Password
+            <input type="password" name="password" placeholder="Enter password" autocomplete="current-password" required>
+        </label>
+
+        <button type="submit">Login</button>
+    </form>
+</section>
+{% endblock %}

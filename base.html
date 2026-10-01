@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}CUZ QR Attendance{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header class="app-header">
+        <a class="brand" href="{{ url_for('home') }}">
+            <img class="brand-logo" src="{{ url_for('static', filename='cavendish-logo.jpg') }}" alt="Cavendish University Zambia logo">
+            <span class="brand-text">
+                <span class="brand-name">QR Attendance System</span>
+                <span class="brand-subtitle">Cavendish University Zambia</span>
+            </span>
+        </a>
+
+        <nav class="nav-links" aria-label="Main navigation">
+            {% if session.get('user') %}
+                <a href="{{ url_for('create_session') }}">Sessions</a>
+                <a href="{{ url_for('view_records') }}">Reports</a>
+                <a href="{{ url_for('view_students') }}">Students</a>
+                <a href="{{ url_for('add_student') }}">Add Student</a>
+                <a href="{{ url_for('manage_courses') }}">Courses</a>
+                <a href="{{ url_for('logout') }}">Logout</a>
+            {% elif session.get('student_id') %}
+                <a href="{{ url_for('student_dashboard') }}">Student Dashboard</a>
+                <a href="{{ url_for('student_dashboard') }}#courses">My Courses</a>
+                <a href="{{ url_for('student_attendance_report') }}">My Attendance</a>
+                <a href="{{ url_for('logout') }}">Logout</a>
+            {% else %}
+                <a href="{{ url_for('home') }}">Home</a>
+                <a href="{{ url_for('lecturer_login') }}">Lecturer Login</a>
+                <a href="{{ url_for('student_login') }}">Student Login</a>
+                <a href="{{ url_for('register') }}">Register</a>
+            {% endif %}
+        </nav>
+    </header>
+
+    <main class="page-shell">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-stack" role="status" aria-live="polite">
+                    {% for category, message in messages %}
+                        <div class="flash flash-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    {% block scripts %}{% endblock %}
+</body>
+</html>

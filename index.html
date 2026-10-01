@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}Cavendish Attendance | QR Attendance System{% endblock %}
+
+{% block content %}
+<section class="landing-shell">
+    <div class="landing-hero">
+        <span class="eyebrow">Cavendish Attendance</span>
+        <h1 class="page-title">QR Attendance System</h1>
+        <p class="lead">Create lecture sessions, display QR codes, and record student attendance from phones connected to the same Wi-Fi.</p>
+    </div>
+
+    <div class="login-choice-grid">
+        <a class="choice-card" href="{{ url_for('lecturer_login') }}">
+            <span class="choice-icon">L</span>
+            <strong>Lecturer Login</strong>
+            <span>Secure Lecturer Login</span>
+        </a>
+
+        <a class="choice-card choice-card-green" href="{{ url_for('student_login') }}">
+            <span class="choice-icon">S</span>
+            <strong>Student Login</strong>
+            <span>Secure Student Attendance</span>
+        </a>
+    </div>
+</section>
+{% endblock %}

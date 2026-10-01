@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block title %}Attendance Records | CUZ QR Attendance{% endblock %}
+
+{% block content %}
+<section class="wide-panel panel">
+    <h1 class="page-title">Attendance Records</h1>
+    <p class="lead">View attendance records and generate reports for lecture sessions.</p>
+
+    <form class="filter-bar" method="GET">
+        <label>
+            Course
+            <select name="course_code">
+                <option value="">All courses</option>
+                {% for course in courses %}
+                    <option value="{{ course['course_code'] }}" {% if course['course_code'] == selected_course %}selected{% endif %}>
+                        {{ course["course_code"] }} - {{ course["course_name"] }}
+                    </option>
+                {% endfor %}
+            </select>
+        </label>
+
+        <label>
+            Lecture session
+            <select name="session_code">
+                <option value="">All sessions</option>
+                {% for item in sessions %}
+                    <option value="{{ item['session_code'] }}" {% if item['session_code'] == selected_session %}selected{% endif %}>
+                        {{ item["course_code"] or "Course" }}{% if item["course_name"] %} {{ item["course_name"] }}{% endif %} - {{ item["name"] }}
+                    </option>
+                {% endfor %}
+            </select>
+        </label>
+
+        <div class="actions">
+            <button type="submit">Filter</button>
+            <a class="button button-secondary" href="{{ url_for('export_attendance_report', session_code=selected_session, course_code=selected_course) }}">Download Attendance Report</a>
+        </div>
+    </form>
+
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Student ID</th>
+                    <th>Session</th>
+                    <th>Course</th>
+                    <th>Course Name</th>
+                    <th>Status</th>
+                    <th>Session Status</th>
+                    <th>Expires</th>
+                    <th>Time</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in records %}
+                    <tr>
+                        <td>{{ row["id"] }}</td>
+                        <td>{{ row["name"] }}</td>
+                        <td>{{ row["student_id"] }}</td>
+                        <td>{{ row["session_name"] or "Unknown session" }}</td>
+                        <td>{{ row["course_code"] or "Not set" }}</td>
+                        <td>{{ row["course_name"] or "Not set" }}</td>
+                        <td><span class="status-badge status-{{ (row['attendance_status'] or 'Present')|lower }}">{{ row["attendance_status"] or "Present" }}</span></td>
+                        <td><span class="status-badge status-{{ row['session_status'] or 'open' }}">{{ row["session_status"] or "open" }}</span></td>
+                        <td>{{ row["expires_at"] or "Not set" }}</td>
+                        <td>{{ row["timestamp"] }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        {% if not records %}
+            <div class="empty-state">No attendance records have been submitted yet.</div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

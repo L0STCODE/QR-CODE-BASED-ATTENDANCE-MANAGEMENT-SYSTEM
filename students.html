@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}Students | CUZ QR Attendance{% endblock %}
+
+{% block content %}
+<section class="wide-panel panel">
+    <div class="section-heading-row">
+        <div>
+            <h1 class="page-title">Students</h1>
+            <p class="lead">View registered students, assigned courses, and attendance counts.</p>
+        </div>
+        <a class="button" href="{{ url_for('add_student') }}">Add Student</a>
+    </div>
+
+    {% if students %}
+        <div class="student-list">
+            {% for student in students %}
+                <article class="student-row-card">
+                    <div>
+                        <strong>{{ student["name"] }}</strong>
+                        <p class="muted">{{ student["student_number"] }}</p>
+                    </div>
+
+                    <div class="details-list compact-details">
+                        <p><strong>Programme:</strong> {{ student["programme"] or "BSc Computing" }}</p>
+                        <p><strong>Year:</strong> {{ student["year"] or 3 }}</p>
+                        <p><strong>Semester:</strong> {{ student["semester"] or 2 }}</p>
+                        <p><strong>Mode:</strong> {{ student["mode"] or "Full-time" }}</p>
+                        <p><strong>Attendance records:</strong> {{ student["attendance_count"] }}</p>
+                    </div>
+
+                    <div class="student-course-tags">
+                        {% for course in student_courses.get(student["id"], []) %}
+                            <span class="status-badge">{{ course["course_code"] }}</span>
+                        {% else %}
+                            <span class="muted">No courses assigned</span>
+                        {% endfor %}
+                    </div>
+                </article>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">No students have been added yet.</div>
+    {% endif %}
+</section>
+{% endblock %}

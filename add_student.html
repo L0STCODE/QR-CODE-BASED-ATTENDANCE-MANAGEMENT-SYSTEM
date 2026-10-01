@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}Add Student | CUZ QR Attendance{% endblock %}
+
+{% block content %}
+<section class="wide-panel panel">
+    <h1 class="page-title">Add Student</h1>
+    <p class="lead">Create a student login account and assign courses for attendance tracking.</p>
+
+    <form class="form-grid add-student-form" method="POST">
+        <label>
+            Student name
+            <input type="text" name="name" autocomplete="name" required>
+        </label>
+
+        <label>
+            Student number
+            <input type="text" name="student_number" placeholder="110-177" pattern="\d{3}-\d{3}" required>
+        </label>
+
+        <label>
+            Password
+            <input type="password" name="password" autocomplete="new-password" required>
+        </label>
+
+        <label>
+            Programme
+            <input type="text" name="programme" value="BSc Computing" required>
+        </label>
+
+        <label>
+            Year
+            <input type="number" name="year" value="3" required>
+        </label>
+
+        <label>
+            Semester
+            <input type="number" name="semester" value="2" required>
+        </label>
+
+        <label>
+            Mode
+            <input type="text" name="mode" value="Full-time" required>
+        </label>
+
+        <fieldset class="course-checks full-span">
+            <legend>Courses to assign</legend>
+            {% for course in courses %}
+                <label class="check-row">
+                    <input type="checkbox" name="course_ids" value="{{ course['id'] }}" checked>
+                    <span>{{ course["course_code"] }} - {{ course["course_name"] }}</span>
+                </label>
+            {% endfor %}
+        </fieldset>
+
+        <section class="new-course-box full-span">
+            <h2 class="section-title">Add New Course</h2>
+            <p class="muted">Optional: enter a new course here to save it and assign it to this student.</p>
+            <div class="form-grid two-columns">
+                <label>
+                    New Course Code
+                    <input type="text" name="new_course_code" placeholder="IT326">
+                </label>
+                <label>
+                    New Course Name
+                    <input type="text" name="new_course_name" placeholder="Computer Networks">
+                </label>
+            </div>
+        </section>
+
+        <button type="submit">Add and Assign</button>
+    </form>
+</section>
+{% endblock %}

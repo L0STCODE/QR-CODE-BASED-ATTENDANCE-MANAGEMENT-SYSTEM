@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}Create Account | CUZ QR Attendance{% endblock %}
+
+{% block content %}
+<section class="panel">
+    <h1 class="page-title">Create Account</h1>
+    <p class="lead">Register a lecturer account to start and manage CUZ attendance sessions.</p>
+
+    <form class="form-grid" method="POST">
+        <label>
+            Username
+            <input type="text" name="username" autocomplete="username" required>
+        </label>
+
+        <label>
+            Password
+            <input type="password" name="password" autocomplete="new-password" required>
+        </label>
+
+        <button type="submit">Register</button>
+    </form>
+
+    <p class="muted center-text">
+        Already registered? <a href="{{ url_for('lecturer_login') }}">Login</a>
+    </p>
+</section>
+{% endblock %}

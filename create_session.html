@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+
+{% block title %}Sessions | CUZ QR Attendance{% endblock %}
+
+{% block content %}
+<section class="panel">
+    <h1 class="page-title">Create Lecture Session</h1>
+    <p class="lead">Start a lecture session, display the QR code, and watch attendance update live.</p>
+
+    <form class="form-grid" method="POST">
+        <label>
+            Existing Course
+            <select name="existing_course">
+                <option value="">Select a course</option>
+                {% for course in courses %}
+                    <option value="{{ course['course_code'] }}">{{ course["course_code"] }} - {{ course["course_name"] }}</option>
+                {% endfor %}
+            </select>
+        </label>
+
+        <label>
+            New Course Code
+            <input type="text" name="new_course_code" placeholder="IT326" autocomplete="off">
+        </label>
+
+        <label>
+            New Course Name
+            <input type="text" name="new_course_name" placeholder="Computer Networks" autocomplete="off">
+        </label>
+
+        <label>
+            Session Name
+            <input type="text" name="session_name" placeholder="Week 5 AI Lecture" autocomplete="off" required>
+        </label>
+
+        <label>
+            Duration in minutes
+            <input type="number" name="duration_minutes" min="5" max="480" autocomplete="off">
+        </label>
+
+        <button type="submit">Start Session</button>
+    </form>
+</section>
+
+<section class="wide-panel panel section-gap">
+    <h2 class="section-title">Lecturer Dashboard Summary</h2>
+
+    <div class="summary-grid lecturer-stats">
+        <div class="stat"><span class="muted">Total sessions</span><span class="stat-value">{{ stats.total_sessions }}</span></div>
+        <div class="stat"><span class="muted">Open sessions</span><span class="stat-value">{{ stats.open_sessions }}</span></div>
+        <div class="stat"><span class="muted">Closed sessions</span><span class="stat-value">{{ stats.closed_sessions }}</span></div>
+        <div class="stat"><span class="muted">Expired sessions</span><span class="stat-value">{{ stats.expired_sessions }}</span></div>
+        <div class="stat"><span class="muted">Attendance records</span><span class="stat-value">{{ stats.total_attendance }}</span></div>
+        <div class="stat"><span class="muted">Total students</span><span class="stat-value">{{ stats.total_students }}</span></div>
+        <div class="stat"><span class="muted">Total courses</span><span class="stat-value">{{ stats.total_courses }}</span></div>
+    </div>
+
+    <div class="quick-actions">
+        <a class="quick-card" href="{{ url_for('create_session') }}">Create Attendance Session</a>
+        <a class="quick-card" href="{{ url_for('view_records') }}">View Attendance Records</a>
+        <a class="quick-card" href="{{ url_for('view_students') }}">View Students</a>
+        <a class="quick-card" href="{{ url_for('manage_courses') }}">Manage Courses</a>
+    </div>
+</section>
+
+{% if sessions %}
+<section class="wide-panel panel section-gap">
+    <h2 class="section-title">Recent Lecture Sessions</h2>
+
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Course</th>
+                    <th>Session</th>
+                    <th>Status</th>
+                    <th>Duration</th>
+                    <th>Expires</th>
+                    <th>Created</th>
+                    <th>Open</th>
+                    <th>Delete</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in sessions %}
+                    <tr>
+                        <td>
+                            {{ item["course_code"] or "Not set" }}
+                            {% if item["course_name"] %}<br><span class="muted">{{ item["course_name"] }}</span>{% endif %}
+                        </td>
+                        <td>{{ item["name"] }}</td>
+                        <td><span class="status-badge status-{{ item['status'] or 'open' }}">{{ item["status"] or "open" }}</span></td>
+                        <td>{{ item["duration_minutes"] or 120 }} minutes</td>
+                        <td>{{ item["expires_at"] }}</td>
+                        <td>{{ item["created_at"] }}</td>
+                        <td><a href="{{ url_for('lecturer_dashboard', session_code=item['session_code']) }}">View</a></td>
+                        <td>
+                            <form class="inline-form" method="POST" action="{{ url_for('delete_session', session_code=item['session_code']) }}" data-confirm-delete="true">
+                                <button class="button-danger button-small" type="submit">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% else %}
+<section class="wide-panel panel section-gap">
+    <div class="empty-state">No sessions have been created yet.</div>
+</section>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+{% endblock %}
